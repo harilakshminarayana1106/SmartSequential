@@ -4,8 +4,36 @@ const cors = require("cors");
 const pool = require("./db");
 
 const app = express();
-app.use(cors());
+
+/* =============================
+   CORS CONFIG (IMPORTANT)
+============================= */
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://your-frontend.vercel.app"   // 🔁 Replace with your real Vercel URL
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
+
+/* =============================
+   ROOT ROUTE (Fixes Cannot GET /)
+============================= */
+app.get("/", (req, res) => {
+  res.json({
+    message: "Smart Sequential Backend Running 🚀",
+    status: "OK"
+  });
+});
+
+/* =============================
+   HEALTH CHECK
+============================= */
+app.get("/health", (req, res) => {
+  res.json({ status: "Server Healthy ✅" });
+});
 
 /* =============================
    GET ENGINEERS
@@ -17,11 +45,10 @@ app.get("/engineers", async (req, res) => {
     );
     res.json(result.rows);
   } catch (err) {
-    console.log(err);
+    console.error("GET ENGINEERS ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 /* =============================
    CREATE CALL + SMART ROUND ROBIN
@@ -30,28 +57,19 @@ app.post("/create-call", async (req, res) => {
   try {
     const data = req.body;
 
-    /* Normalize specialization */
-    const specialization = data.specialization
-      ?.toLowerCase()
-      ?.trim();
+    const specialization = data.specialization?.toLowerCase()?.trim();
 
-    /* Weighted workload calculation */
     const quantity = Number(data.quantity) || 1;
     let weight = 1;
 
     const problemText = (data.problem || "").toLowerCase();
 
-    if (problemText.includes("refill")) {
-      weight = 0.2;
-    } else if (problemText.includes("installation")) {
-      weight = 5;
-    } else if (problemText.includes("service")) {
-      weight = 3;
-    }
+    if (problemText.includes("refill")) weight = 0.2;
+    else if (problemText.includes("installation")) weight = 5;
+    else if (problemText.includes("service")) weight = 3;
 
     const workload = weight * quantity;
 
-    /* Smart round robin assignment */
     const eng = await pool.query(
       `SELECT *
        FROM engineers
@@ -66,7 +84,6 @@ app.post("/create-call", async (req, res) => {
     if (eng.rows.length > 0) {
       engineer_id = eng.rows[0].id;
 
-      /* Add workload cumulatively */
       await pool.query(
         `UPDATE engineers
          SET status='busy',
@@ -77,7 +94,6 @@ app.post("/create-call", async (req, res) => {
       );
     }
 
-    /* Insert call */
     const result = await pool.query(
       `INSERT INTO calls(
         call_id,
@@ -140,7 +156,6 @@ app.post("/create-call", async (req, res) => {
   }
 });
 
-
 /* =============================
    GET CALLS WITH ENGINEER NAME
 ============================= */
@@ -159,19 +174,16 @@ app.get("/calls/:status", async (req, res) => {
     res.json(result.rows);
 
   } catch (err) {
-    console.log(err);
+    console.error("GET CALLS ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-
 /* =============================
    COMPLETE CALL
-   (NO workload reduction now)
 ============================= */
 app.post("/complete-call/:id", async (req, res) => {
   try {
-
     await pool.query(
       `UPDATE calls
        SET status='completed',
@@ -184,10 +196,10 @@ app.post("/complete-call/:id", async (req, res) => {
     res.json({ message: "Call Completed" });
 
   } catch (err) {
+    console.error("COMPLETE CALL ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 /* =============================
    CANCEL CALL
@@ -206,14 +218,16 @@ app.post("/cancel-call/:id", async (req, res) => {
     res.json({ message: "Call Cancelled" });
 
   } catch (err) {
+    console.error("CANCEL CALL ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-
+/* =============================
+   START SERVER
+============================= */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on port ${PORT}`)
-);
-
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
