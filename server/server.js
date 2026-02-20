@@ -6,24 +6,20 @@ const pool = require("./db");
 const app = express();
 
 /* =============================
-   CORS CONFIG (IMPORTANT)
+   CORS CONFIG (FINAL FIX)
 ============================= */
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://smartsequential-mfls4xg9t-harilakshminarayana1106s-projects.vercel.app"
-];
-
-const cors = require("cors");
-
 app.use(cors({
-  origin: "*",
-  methods: ["GET","POST","PUT","DELETE"],
-  allowedHeaders: ["Content-Type","Authorization"]
+  origin: [
+    "http://localhost:5173",
+    "https://smartsequential.vercel.app"
+  ],
+  credentials: true
 }));
+
 app.use(express.json());
 
 /* =============================
-   ROOT ROUTE (Fixes Cannot GET /)
+   ROOT ROUTE
 ============================= */
 app.get("/", (req, res) => {
   res.json({
