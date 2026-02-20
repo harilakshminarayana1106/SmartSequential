@@ -11,7 +11,7 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://smartsequential.vercel.app/"   // 🔁 Replace with your real Vercel URL
+    "https://smartsequential-mfls4xg9t-harilakshminarayana1106s-projects.vercel.app"
   ],
   credentials: true
 }));
