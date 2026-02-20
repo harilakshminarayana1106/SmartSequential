@@ -8,11 +8,19 @@ const app = express();
 /* =============================
    CORS CONFIG (IMPORTANT)
 ============================= */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://smartsequential-mfls4xg9t-harilakshminarayana1106s-projects.vercel.app"
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://smartsequential-mfls4xg9t-harilakshminarayana1106s-projects.vercel.app"
-  ],
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"));
+    }
+  },
   credentials: true
 }));
 
