@@ -1,0 +1,11 @@
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-right input {
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
