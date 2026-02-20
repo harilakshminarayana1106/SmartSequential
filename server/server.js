@@ -13,17 +13,13 @@ const allowedOrigins = [
   "https://smartsequential-mfls4xg9t-harilakshminarayana1106s-projects.vercel.app"
 ];
 
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS not allowed"));
-    }
-  },
-  credentials: true
-}));
+const cors = require("cors");
 
+app.use(cors({
+  origin: "*",
+  methods: ["GET","POST","PUT","DELETE"],
+  allowedHeaders: ["Content-Type","Authorization"]
+}));
 app.use(express.json());
 
 /* =============================
