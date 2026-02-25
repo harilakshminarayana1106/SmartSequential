@@ -28,7 +28,8 @@ export default function Dashboard() {
             {engineers.map(e => (
               <tr key={e.id}>
                 <td>{e.name}</td>
-                <td>{e.skill}</td>
+                 <td>{e.status}</td>
+                <td>{e.specialization}</td>
               </tr>
             ))}
           </tbody>
