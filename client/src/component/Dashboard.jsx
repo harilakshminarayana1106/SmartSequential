@@ -20,7 +20,8 @@ export default function Dashboard() {
           <thead>
             <tr>
               <th>Name</th>
-              <th>Skill</th>
+             <th>Status</th>
+              <th>Specialization</th>
             </tr>
           </thead>
 
